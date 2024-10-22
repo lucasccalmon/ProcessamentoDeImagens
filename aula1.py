@@ -24,10 +24,11 @@ print('qtde de canais:', end='')
 print(imagem.shape[2])
 
 (b,g,r) = imagem[0, 0]
-print (b, g, r)
-print(imagem.shape)
-print(imagem.size)
-print(imagem.ndim)
+print ('azul, verde, vermelho:', b, g, r)
+print('tamanho da matriz:',imagem.shape)
+print('tamanho da imagem (l x a x canais):', imagem.size)
+print('numero de dimensoes:', imagem.ndim)
+
 
 
 #trasnformando a imagem
