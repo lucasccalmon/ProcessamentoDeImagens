@@ -8,6 +8,7 @@ Created on Tue Oct 22 16:41:02 2024
 import numpy as np
 import matplotlib.pyplot as plt
 
+#transformar uma imagem em tons de cinza
 def CanalCinza(imagem):
     canalCinza = np.zeros((imagem.shape[0], imagem.shape[1]), dtype= np.uint8)
     for linha in range (imagem.shape[0]):
@@ -15,6 +16,7 @@ def CanalCinza(imagem):
                 canalCinza[linha, coluna] = (imagem[linha, coluna].sum()//3)
     return canalCinza
 
+#gerar histograma de um canal de imagem
 def hist(imagem, canal):
     histograma = np.zeros(256, dtype=np.uint)
     for i in range(imagem.shape[0]):
@@ -22,6 +24,7 @@ def hist(imagem, canal):
             histograma[imagem[i][j]] += 1
     return histograma
 
+#plotar um gráfico para o histograma
 def plotarGrafico(imagem, cor):
     X = [0] * 256
     for i in range(256):
@@ -32,6 +35,7 @@ def plotarGrafico(imagem, cor):
     plt.bar(X, imagem, color=cor)
     plt.show()
     
+#transformar uma imagem em tons de cinza em uma imagem branca e uma preta
 def BrancoPreto(imagemCinza, corte):
     corBranca = imagemCinza.copy()
     corPreta = imagemCinza.copy()
@@ -47,3 +51,65 @@ def BrancoPreto(imagemCinza, corte):
                 
     return corBranca, corPreta
 
+#alterar imagem com curva de tom - contraste ou luminosidade
+def curvaTom(imagem, c, l):
+    imagem = imagem.astype(np.float32)
+    toned_image = c * imagem + l
+    toned_image = np.clip(toned_image, 0, 255)
+    toned_image = toned_image.astype(np.uint8)
+    plotCurvaTom(c,l)   
+    return toned_image           
+
+#transformar imagem no negativo
+def curvaTomNeg(imagem, c, l):
+    imagem = imagem.astype(np.float32)
+    imagem = 255 - imagem
+    toned_image = c * imagem + l
+    toned_image = np.clip(toned_image, 0, 255)
+    toned_image = toned_image.astype(np.uint8)
+    plotCurvaTomNeg(c,l)   
+    return toned_image    
+
+#gerar grafico da curva de tom
+def plotCurvaTom(c, l):
+    r = np.linspace(0, 255, 256)
+    tone_curve = c*r+l
+    tone_curve = np.clip(tone_curve, 0, 255)
+    plt.figure(figsize=(8,6))
+    plt.plot(r, tone_curve, color='blue', label=f'c= {c}, l = {l}')
+    plt.xlabel('origem r')
+    plt.ylabel('ajustado cr +l')
+    plt.title('curva de tom')
+    plt.legend()
+    plt.grid()
+    plt.show()
+   
+   #gerar grafico da curva de tom negativa
+def plotCurvaTomNeg(c, l):
+    r = np.linspace(0, 255, 256)
+    r_neg = 255 - r
+    tone_curven = c*r_neg+l
+    tone_curven = np.clip(tone_curven, 0, 255)
+    plt.figure(figsize=(8,6))
+    plt.plot(r, tone_curven, color='blue', label=f'c= {c}, l = {l} (Negativo)')
+    plt.xlabel('origem r')
+    plt.ylabel('ajustado cr +l')
+    plt.title('curva de tom negativa')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+#expandir uma imagem de baixo contraste (enviar uma img em tons de cinza)
+def expansaohist(img,r1,r2):
+    expansao = img.copy()
+    for i in range(expansao.shape[0]):
+        for j in range(expansao.shape[1]):
+            if expansao[i][j] >= r2:
+                expansao[i][j] = 255
+            if expansao[i][j] <= r1:
+                expansao[i][j] = 0
+            if r1 < expansao[i][j] < r2:
+                expansao[i][j] = 255 *((expansao[i][j] - r1)/(r2-r1))
+    return expansao
+    
+    
