@@ -24,6 +24,7 @@ def hist(imagem, canal):
             histograma[imagem[i][j]] += 1
     return histograma
 
+
 #plotar um gráfico para o histograma
 def plotarGrafico(imagem, cor):
     X = [0] * 256
@@ -112,4 +113,41 @@ def expansaohist(img,r1,r2):
                 expansao[i][j] = 255 *((expansao[i][j] - r1)/(r2-r1))
     return expansao
     
+#gerar histograma original, histograma normalizado e histograma acumulado
+def histogramaplus(imagem):
+    histograma = np.zeros(256, dtype=np.uint)
+    for i in range(imagem.shape[0]):
+        for j in range(imagem.shape[1]):
+            histograma[imagem[i][j]] += 1
     
+    total_pixels = imagem.shape[0] * imagem.shape[1]
+    
+    # Histograma normalizado
+    histograma_normalizado = histograma / total_pixels
+    
+    #histograma normalizado, somatorio das probabilidades (acumulado normalizado)
+    
+    # Histograma acumulado normalizado 
+    histograma_acumulado = np.zeros(256)
+    acumulado = 0.0
+    for i in range(256):
+        acumulado += histograma_normalizado[i]
+        histograma_acumulado[i] = acumulado
+    print('acumulado', acumulado)
+    
+    return histograma, histograma_normalizado, histograma_acumulado
+    
+def normalizados(histacumulado,imagem):
+    niveis_normalizados = np.round(histacumulado * 255).astype(np.uint8)
+  
+  # Aplicar o mapeamento para cada pixel da imagem
+  #a linha abaixo utiliza indexação, muito pratico
+    #imagem_normalizada = niveis_normalizados[imagem]
+    
+    
+    #o codigo abaixo faz a indexação manualmente
+    imagem_normalizada = np.zeros_like(imagem)
+    for i in range(imagem.shape[0]):
+       for j in range(imagem.shape[1]):
+           imagem_normalizada[i][j] = niveis_normalizados[imagem[i][j]]
+    return niveis_normalizados, imagem_normalizada
