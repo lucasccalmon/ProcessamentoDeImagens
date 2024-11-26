@@ -150,4 +150,4 @@ def normalizados(histacumulado,imagem):
     for i in range(imagem.shape[0]):
        for j in range(imagem.shape[1]):
            imagem_normalizada[i][j] = niveis_normalizados[imagem[i][j]]
-    return niveis_normalizados, imagem_normalizada
+    return niveis_normalizados, imagem_normalizada #histogramaualizado
