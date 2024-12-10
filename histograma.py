@@ -52,6 +52,17 @@ def BrancoPreto(imagemCinza, corte):
                 
     return corBranca, corPreta
 
+#retornar uma imagem de canalCinza em imagem em preto e branco
+def BWimg(imagemCinza, corte):
+    BWimg = imagemCinza.copy()
+    for i in range(BWimg.shape[0]):
+        for j in range(BWimg.shape[1]):
+            if  BWimg[i][j] < corte:
+               BWimg[i][j] = 0
+            if  BWimg[i][j] >= corte:
+               BWimg[i][j] = 255
+    return BWimg
+
 #alterar imagem com curva de tom - contraste ou luminosidade
 def curvaTom(imagem, c, l):
     imagem = imagem.astype(np.float32)
@@ -193,3 +204,39 @@ def borda_convolucao(imagem, mascara, n): #n = n de repetições na convolucao
         imagem = imagem_convoluida.copy()
         n = n-1
     return imagem_com_bordas, imagem_convoluida
+
+def erosao(imagem, estruturante, n):  # n = número de repetições
+    while n > 0:
+        # Adicionar bordas à imagem
+        tamanho_estruturante = estruturante.shape[0]
+        borda = (tamanho_estruturante - 1) // 2
+        imagem_com_bordas = np.zeros(
+            (imagem.shape[0] + 2 * borda, imagem.shape[1] + 2 * borda),
+            dtype=imagem.dtype,
+        )
+        imagem_com_bordas[borda:-borda, borda:-borda] = imagem
+        
+        # Obter dimensões
+        altura_imagem, largura_imagem = imagem_com_bordas.shape
+        altura_estruturante, largura_estruturante = estruturante.shape
+        
+        # Matriz de saída
+        imagem_erodida = np.zeros((altura_imagem - 2 * borda, largura_imagem - 2 * borda), dtype=np.uint8)
+        
+        # Aplicar a operação de erosão
+        for i in range(altura_imagem - 2 * borda):
+            for j in range(largura_imagem - 2 * borda):
+                # Extrair submatriz
+                submatriz = imagem_com_bordas[i:i + altura_estruturante, j:j + largura_estruturante]
+                
+                # Verificar se o estruturante encaixa perfeitamente
+                if np.all(submatriz[estruturante == 1] == 255):  # Checa o "fit"
+                    imagem_erodida[i, j] = 255  # "Fit"
+                else:
+                    imagem_erodida[i, j] = 0  # Não encaixa
+
+        # Atualizar imagem para a próxima iteração
+        imagem = imagem_erodida.copy()
+        n -= 1
+
+    return imagem_erodida
