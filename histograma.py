@@ -240,3 +240,39 @@ def erosao(imagem, estruturante, n):  # n = número de repetições
         n -= 1
 
     return imagem_erodida
+
+def dilatacao(imagem, estruturante, n):  # n = número de repetições
+    while n > 0:
+        # Adicionar bordas à imagem
+        tamanho_estruturante = estruturante.shape[0]
+        borda = (tamanho_estruturante - 1) // 2
+        imagem_com_bordas = np.zeros(
+            (imagem.shape[0] + 2 * borda, imagem.shape[1] + 2 * borda),
+            dtype=imagem.dtype,
+        )
+        imagem_com_bordas[borda:-borda, borda:-borda] = imagem
+        
+        # Obter dimensões
+        altura_imagem, largura_imagem = imagem_com_bordas.shape
+        altura_estruturante, largura_estruturante = estruturante.shape
+        
+        # Matriz de saída
+        imagem_dilatada = np.zeros((altura_imagem - 2 * borda, largura_imagem - 2 * borda), dtype=np.uint8)
+        
+        # Aplicar a operação de erosão
+        for i in range(altura_imagem - 2 * borda):
+            for j in range(largura_imagem - 2 * borda):
+                # Extrair submatriz
+                submatriz = imagem_com_bordas[i:i + altura_estruturante, j:j + largura_estruturante]
+                
+                # Verificar se o estruturante encaixa perfeitamente
+                if np.any(submatriz[estruturante == 1] == 255):  # Checa o "hit"
+                    imagem_dilatada[i, j] = 255  # "Hit"
+                else:
+                    imagem_dilatada[i, j] = 0  # Não encaixa
+
+        # Atualizar imagem para a próxima iteração
+        imagem = imagem_dilatada.copy()
+        n -= 1
+
+    return imagem_dilatada
