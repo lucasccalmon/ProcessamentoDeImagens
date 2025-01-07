@@ -276,3 +276,13 @@ def dilatacao(imagem, estruturante, n):  # n = número de repetições
         n -= 1
 
     return imagem_dilatada
+
+def abertura(imagem, mascara, repeticoes):
+    erodida = erosao(imagem, mascara, repeticoes)
+    aberta = dilatacao(erodida, mascara, repeticoes)
+    return aberta
+
+def fechamento(imagem, mascara, repeticoes):
+    dilatada = dilatacao(imagem, mascara, repeticoes)
+    fechada = erosao(dilatada, mascara, repeticoes)
+    return fechada
