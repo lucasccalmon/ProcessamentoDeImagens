@@ -286,3 +286,40 @@ def fechamento(imagem, mascara, repeticoes):
     dilatada = dilatacao(imagem, mascara, repeticoes)
     fechada = erosao(dilatada, mascara, repeticoes)
     return fechada
+
+def inverterBW(imagemBW):
+    BWimg = imagemBW.copy()
+    BWimg = np.where(BWimg == 0, 255, np.where(BWimg == 255, 0, BWimg))
+    return BWimg
+
+def englobar_matriz(B):
+    N = B.shape[0]  # Tamanho da matriz B
+    # Criar uma matriz de tamanho (N+2) x (N+2) preenchida com 1
+    A = np.ones((N+2, N+2), dtype=int)
+    # Substituir os valores de dentro por 0
+    A[1:N+1, 1:N+1] = 0
+    return A
+
+def buscar_formas(BW, matrizest):
+    primeiraerosao = erosao(BW, matrizest, 1)
+    complementoA = inverterBW(BW)
+    #estruturante que englobe matrizest
+    c = englobar_matriz(matrizest)
+    #erosao de complemento A e C
+    segundaerosao = erosao(complementoA, c, 1)
+    intersecao = np.where((primeiraerosao == 255) & (segundaerosao == 255), 255, 0)
+    #transformar ponto no elemento estruturante
+
+    resultado = intersecao.copy()
+
+    coords = np.argwhere(intersecao == 255)
+
+    # Substituir o local correspondente na matriz de resultado com matrizest
+    for coord in coords:
+        x, y = coord
+        N = matrizest.shape[0] // 2
+        # Redimensionar o resultado para incluir a matrizest inteira no ponto indicado
+        resultado[x-N:x + matrizest.shape[0] - N, y-N:y + matrizest.shape[1]-N] = matrizest
+    resultado = np.where((resultado == 1), 255, 0)
+    resultado = resultado.astype(np.uint8)
+    return resultado
